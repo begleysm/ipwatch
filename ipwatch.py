@@ -6,7 +6,7 @@
 #[config] = path to an IPWatch configuration file
 #
 #Sean Begley
-#2017-07-23
+#2017-10-10
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
@@ -65,7 +65,7 @@ class ConfigInfo:
 #help message print
 def printhelp():
     "Function to print out the help message"
-    print("""\r\nIPWatch v0.2 by Sean Begley (begleysm@gmail.com)
+    print("""\r\nIPWatch v0.3 by Sean Begley (begleysm@gmail.com)
 
 IPWatch is a tool to check your current external IP address against a saved, previous, external IP address.  It should be run as a scheduled task/cronjob periodically.  If a difference in the new vs old IP address is found it will dispatch an email describing the change.
 
