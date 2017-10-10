@@ -275,7 +275,7 @@ else:
     if (currip != oldip):
         #send email
         print ("Current IP differs from old IP.")
-        #sendmail(oldip,  currip,  config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
+        sendmail(oldip,  currip,  config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
 
         #update file
         updateoldip(config.save_ip_path,  currip)
