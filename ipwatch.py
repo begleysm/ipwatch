@@ -6,7 +6,7 @@
 #[config] = path to an IPWatch configuration file
 #
 #Sean Begley
-#2017-10-10
+#2017-10-31
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
@@ -65,7 +65,7 @@ class ConfigInfo:
 #help message print
 def printhelp():
     "Function to print out the help message"
-    print("""\r\nIPWatch v0.3 by Sean Begley (begleysm@gmail.com)
+    print("""\r\nIPWatch v0.4 by Sean Begley (begleysm@gmail.com)
 
 IPWatch is a tool to check your current external IP address against a saved, previous, external IP address.  It should be run as a scheduled task/cronjob periodically.  If a difference in the new vs old IP address is found it will dispatch an email describing the change.
 
@@ -122,6 +122,8 @@ def readconfig(filepath,  configObj):
                     configObj.save_ip_path = value
                 elif (param == "try_count"):
                     configObj.try_count = value
+                elif (param == "ip_blacklist"):
+                    configObj.ip_blacklist = value.split(',')
                 else:
                     print ("ERROR: unexpected line found in config file: %s" % line)
 
@@ -136,6 +138,7 @@ def readconfig(filepath,  configObj):
         #print (configObj.smtp_addr)
         #print (configObj.save_ip_path)
         #print (configObj.try_count)
+        #print (configObj.ip_blacklist)
 
         #close the file
         configfile.close()
@@ -145,7 +148,7 @@ def readconfig(filepath,  configObj):
         #print ("file doesn't exist\r\n")
 
 #return the current external IP address
-def getip(try_count):
+def getip(try_count, blacklist):
     "Function to return the current, external, IP address"
     good_ip = 0
     counter = 0
@@ -158,11 +161,14 @@ def getip(try_count):
         currip = ipgetter.myip()
         
         #check to see that it has a ###.###.###.### format
-        if pattern.match(currip):
+        if pattern.match(currip) and currip not in blacklist:
             good_ip = 1
             print ("GetIP: Try %d: Good IP: %s" % (counter+1, currip))
         else:
-            print ("GetIP: Try %d:  Bad IP: %s" % (counter+1, currip))
+            if currip in blacklist:
+                print ("GetIP: Try %d:  Bad IP (in Blacklist): %s" % (counter+1, currip))
+            else:
+                print ("GetIP: Try %d:  Bad IP    (malformed): %s" % (counter+1, currip))
         
         #increment the counter
         counter = counter + 1
@@ -268,7 +274,7 @@ else:
     #print ("Old IP = %s" % oldip)
 
     #get current, external, IP address
-    currip = getip(int(config.try_count))
+    currip = getip(int(config.try_count),  config.ip_blacklist)
     #print ("Curr IP = %s" % currip)
 
     #check to see if the IP address has changed
