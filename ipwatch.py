@@ -7,6 +7,7 @@
 #
 #Sean Begley
 #2017-10-31
+# v0.4
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
@@ -241,7 +242,7 @@ The IP address of """ + machine + """ has changed:
 
 
 ################
-###### MAIN ######
+##### MAIN #####
 ################
 
 #parse arguments
@@ -274,7 +275,7 @@ else:
     #print ("Old IP = %s" % oldip)
 
     #get current, external, IP address
-    currip = getip(int(config.try_count),  config.ip_blacklist)
+    currip = getip(int(config.try_count), config.ip_blacklist)
     #print ("Curr IP = %s" % currip)
 
     #check to see if the IP address has changed
