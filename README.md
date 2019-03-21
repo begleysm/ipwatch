@@ -12,4 +12,4 @@ begleysm@gmail.com
 2017-07-23
 
 REFERENCES
-https://github.com/phoemur/ipgetter
+original ipgetter.py code was from https://github.com/phoemur/ipgetter.  However that repo is gone now.  This repo contains a copy of the ipgetter.py file for those who need it.
