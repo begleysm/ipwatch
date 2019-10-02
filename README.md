@@ -23,17 +23,17 @@ Clone the ipwatch repo by running
 sudo git clone https://github.com/begleysm/ipwatch /opt/ipwatch
 ```
 
-Copy *example_config.txt* to *config.txt* by running
+Copy `example_config.txt` to `config.txt` by running
 ```bash
 sudo cp /opt/ipwatch/example_config.txt /opt/ipwatch/config.txt
 ```
 
-Since *config.txt* will contain an email password, make it viewable & editable by *root* only by running
+Since `config.txt` will contain an email password, make it viewable & editable by `root` only by running
 ```bash
 sudo chmod 600 /opt/ipwatch/config.txt
 ```
 
-Edit *config.txt* by running the following command and observing the instructions in the **Config File** section below.  If you're using Gmail as your sending mail service then be sure to read the **Gmail** section below.
+Edit `config.txt` by running the following command and observing the instructions in the **Config File** section below.  If you're using Gmail as your sending mail service then be sure to read the **Gmail** section below.
 ```bash
 sudo nano /opt/ipwatch/config.txt
 ```
