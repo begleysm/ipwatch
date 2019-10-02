@@ -12,11 +12,37 @@ This program gets for your external IP address, checks it against your "saved" I
 4. `./ipwatch.py config.txt`
 
 ## Installation
-ipwatch requires Python to run.  On Debian based systems you can install python3 by running
-
+### Debian based Linux systems
+Install python3 and git by running
 ```bash
-sudo apt install python3
+sudo apt install python3 git
 ```
+
+Clone the ipwatch repo by running
+```bash
+sudo git clone https://github.com/begleysm/ipwatch /opt/ipwatch
+```
+
+Copy *example_config.txt* to *config.txt* by running
+```bash
+sudo cp /opt/ipwatch/example_config.txt /opt/ipwatch/config.txt
+```
+
+Since *config.txt* will contain an email password, make it viewable & editable by *root* only by running
+```bash
+sudo chmod 600 /opt/ipwatch/config.txt
+```
+
+Edit *config.txt* by running the following command and observing the instructions in the **Config File** section below.  If you're using Gmail as your sending mail service then be sure to read the **Gmail** section below.
+```bash
+sudo nano /opt/ipwatch/config.txt
+```
+
+You can test the setup by running
+```bash
+sudo python3 /opt/ipwatch/ipwatch.py /opt/ipwatch/ipwatch/config.txt
+```
+Check out the **Cronjob** section below to make this utility run on its own so that you may be quickly alerted to any IP changes on your system.
 
 ## Config File
 ipwatch uses a config file to define how to send an email.  An example and description is below.  A similar config file is in the repo as example_config.txt.  You should copy it by running something like `sudo cp example_config.txt config.txt` and then modify `config.txt`. It is recommended that you adjust the permissions of your config file so that no one but you and/or root can read it since it will contain the sender email password.
