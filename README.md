@@ -40,7 +40,7 @@ sudo nano /opt/ipwatch/config.txt
 
 You can test the setup by running
 ```bash
-sudo python3 /opt/ipwatch/ipwatch.py /opt/ipwatch/ipwatch/config.txt
+sudo python3 /opt/ipwatch/ipwatch.py /opt/ipwatch/config.txt
 ```
 Check out the **Cronjob** section below to make this utility run on its own so that you may be quickly alerted to any IP changes on your system.
 
