@@ -71,7 +71,7 @@ ip_blacklist=192.168.0.255,192.168.0.1,192.168.1.255,192.168.1.1  #this is a lis
 ```
 
 ## Cronjob
-ipwatch works best when setup as a cronjob.  It assumes that you've cloned the ipwatch repo into `/opt/ipwatch` and that your config file is in the same location.  You can access root's crontab by running
+ipwatch works best when setup as a cronjob.  For the following instructions I assume that you've cloned the ipwatch repo into `/opt/ipwatch` and that your config file is in the same location.  You can access root's crontab by running
 
 ```bash
 sudo su
