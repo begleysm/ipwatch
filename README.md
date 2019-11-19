@@ -86,12 +86,7 @@ Below is an example crontab entry to run ipwatch once per hour.
 If you want to/need to run the cronjob as an unprivileged user you'll have to ensure that your user has execution privileges for `ipwatch.py` and can write to the `save_ip_path` file defined in your config file.  This is probably most easily accomplished by installing *ipwatch* somewhere under your home directory.
 
 ## Gmail
-If you use Gmail as your sending email service then you'll have to enable **Less secure app access** to allow ipwatch to send emails. You can read more about this at https://support.google.com/accounts/answer/6010255?hl=en.  You can enable **Less secure app access** by visiting https://myaccount.google.com/lesssecureapps.  Chances are you'll also be blocked, by Gmail, the first time you try try to send an email and will receive a **Critical security alert** saying that a **Sign-in attempt was blocked for your linked Google Account** at your recovery email/phone #.  You'll have to click the **Check activity** button and say **Yes that was me** in order to whitelist the ipwatch system.
+If you use Gmail as your sending email service then you'll have to enable **Less secure app access** to allow ipwatch to send emails. You can read more about this at https://support.google.com/accounts/answer/6010255?hl=en.  You can enable **Less secure app access** by visiting https://myaccount.google.com/lesssecureapps.  Chances are you'll also be blocked, by Gmail, the first time you try try to send an email and will receive a **Critical security alert** saying that a **Sign-in attempt was blocked for your linked Google Account** at your recovery email/phone #.  You'll have to click the **Check activity** button and say **Yes that was me** in order to whitelist the *ipwatch* machine.
 
 ## References
-The original ipgetter.py code came from https://github.com/phoemur/ipgetter.  However that repo is gone now.  This repo contains a copy of the ipgetter.py file for those who need it.  Additionally by keeping ipgetter.py in the same directory as ipwatch.py no additional Python installtion efforts (for the ipgetter module) need be conducted.  The version of ipgetter.py in this repository has been updated to remove reference to ip servers that no longer work.
-
-## Author
-Sean Begley
-begleysm@gmail.com
-2019-10-21
+The original ipgetter.py code came from https://github.com/phoemur/ipgetter.  However that repo is gone now.  This repo contains a copy of the ipgetter.py file for those who need it.  Additionally by keeping ipgetter.py in the same directory as ipwatch.py no additional Python installation efforts (for the ipgetter module) need be conducted.  The version of ipgetter.py in this repository has been updated to remove references to ip servers that no longer work.
