@@ -56,17 +56,17 @@ Check out the **Cronjob** section below to make this utility run on its own so t
 ipwatch uses a config file to define how to send an email.  An example and description is below.  A similar config file is in the repo as example_config.txt.  You should copy it by running something like `sudo cp example_config.txt config.txt` and then modify `config.txt`. It is recommended that you adjust the permissions of your config file so that no one but you and/or root can read it since it will contain the sender email password.
 
 ```bash
-sender=Bob Sender                   #this is the name of the email sender
-sender_email=bobsender@gmail.com    #this is the email address the email will be sent from
-sender_username=bobsender           #this is the username (in this example gmail username) of the sender
-sender_password=password1           #this is the password (in this example gmail password) of the sender
-receiver=Tom Receiver               #this is the name of the recipient
-receiver_email=tomreceive@gmail.com #this is the email address of the recipient
-subject_line=My IP Has Changed!     #this is the subject line of the sent email
-machine=Test_Machine                #this is the name of the machine sending the email
-smtp_addr=smtp.gmail.com:587        #this is the SMTP address for the sending email server (in this case gmail)
-save_ip_path=/opt/ipwatch/oldip.txt #this is the location where the saved ip address will be stored
-try_count=10                        #this defines how many times the system will try to find the current IP before exiting
+sender=Bob Sender                    #this is the name of the email sender
+sender_email=bobsender@gmail.com     #this is the email address the email will be sent from
+sender_username=bobsender            #this is the username (in this example gmail username) of the sender
+sender_password=password1            #this is the password (in this example gmail password) of the sender
+receiver=Tom Receiver                #this is the name of the recipient
+receiver_email=tomreceiver@gmail.com #this is the email address of the recipient
+subject_line=My IP Has Changed!      #this is the subject line of the sent email
+machine=Test_Machine                 #this is the name of the machine sending the email
+smtp_addr=smtp.gmail.com:587         #this is the SMTP address for the sending email server (in this case gmail)
+save_ip_path=/opt/ipwatch/oldip.txt  #this is the location where the saved ip address will be stored
+try_count=10                         #this defines how many times the system will try to find the current IP before exiting
 ip_blacklist=192.168.0.255,192.168.0.1,192.168.1.255,192.168.1.1  #this is a list of IP address to ignore if received
 ```
 
