@@ -33,6 +33,8 @@ import re
 import random
 import ssl
 import json
+import os 
+from datetime import datetime, timedelta
 
 from sys import version_info
 
@@ -62,7 +64,46 @@ class IPgetter(object):
     '''
 
     def __init__(self):
-        self.server_list = json.load ('servers.json')
+        JSON_FILENAME = 'serverCache.json'
+        now           = datetime.now()
+        currentTS     = datetime.timestamp(now)
+        theList       = None
+        if os.path.isfile(JSON_FILENAME):
+            try:
+                with open(JSON_FILENAME, 'r') as infile:
+                    theList   = json.load (infile)
+            except:
+                pass
+                
+        if (theList is None
+         or "expiry"         not in theList
+         or "expiryDisplay"  not in theList
+         or "servers"        not in theList
+         or theList["expiry"]         is None
+         or theList["expiryDisplay"]  is None
+         or theList["servers"]        is None
+         or not isinstance(theList["expiry"],float)
+         or len(str(theList["expiry"])) == 0
+         or not isinstance(theList["servers"],list)
+         or len(theList["servers"])     == 0
+         or theList["expiry"] < currentTS
+           ): # we will go off and get the list again
+            expiryDate = (now +  timedelta(days=90))
+            theList = dict (expiry         = datetime.timestamp(expiryDate)
+                           ,expiryDisplay  = expiryDate.strftime('%Y-%m-%dT%H:%M:%S')
+                           ,servers        = []
+                           )
+            operUrl = urllib.urlopen("https://raw.githubusercontent.com/TheFlyingBadger/ipwatch/master/servers.json")
+            if(operUrl.getcode()==200):
+                data               = operUrl.read()
+                theList["servers"] = json.loads(data)
+                with open(JSON_FILENAME, 'w') as outfile:
+                    outfile.write(json.dumps(theList, indent=4))
+            else:
+                print("Error receiving data", operUrl.getcode())
+        self.server_list = theList["servers"]
+        theList = None
+
     def get_externalip(self):
         '''
         This function gets your IP from a random server
@@ -72,10 +113,8 @@ class IPgetter(object):
         for i in range(7):
             myip = self.fetch(random.choice(self.server_list))
             if myip != '':
-                return myip
-            else:
-                continue
-        return ''
+                break
+        return myip
 
     def fetch(self, server):
         '''
@@ -135,3 +174,4 @@ class IPgetter(object):
 
 if __name__ == '__main__':
     print(myip())
+
