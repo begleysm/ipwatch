@@ -32,6 +32,7 @@ as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
 import re
 import random
 import ssl
+import json
 
 from sys import version_info
 
@@ -61,47 +62,7 @@ class IPgetter(object):
     '''
 
     def __init__(self):
-        self.server_list = ['http://ip.dnsexit.com',
-                            'http://ifconfig.me/ip',
-                            'http://ipecho.net/plain',
-                            'http://checkip.dyndns.org/plain',
-                            'http://websiteipaddress.com/WhatIsMyIp',
-                            #'http://getmyipaddress.org/',
-                            'http://www.my-ip-address.net/',
-                            'http://myexternalip.com/raw',
-                            'http://www.canyouseeme.org/',
-                            'http://www.trackip.net/',
-                            'http://icanhazip.com/',
-                            #'http://www.iplocation.net/',
-                            'http://www.ipchicken.com/',
-                            'http://whatsmyip.net/',
-                            'http://www.ip-adress.com/',
-                            #'http://checkmyip.com/',
-                            'http://www.tracemyip.org/',
-                            'http://www.lawrencegoetz.com/programs/ipinfo/',
-                            #'http://www.findmyip.co/',
-                            'http://ip-lookup.net/',
-                            'http://www.mon-ip.com/en/my-ip/',
-                            'http://ipgoat.com/',
-                            'http://www.myipnumber.com/my-ip-address.asp',
-                            'http://formyip.com/',
-                            'https://check.torproject.org/',
-                            'http://www.displaymyip.com/',
-                            #'http://www.bobborst.com/tools/whatsmyip/',
-                            'http://www.geoiptool.com/',
-                            'https://www.whatsmydns.net/whats-my-ip-address.html',
-                            'https://www.privateinternetaccess.com/pages/whats-my-ip/',
-                            'http://checkip.dyndns.com/',
-                            'http://www.ip-adress.eu/',
-                            'http://www.infosniper.net/',
-                            'https://wtfismyip.com/text',
-                            #'http://ipinfo.io/',
-                            'http://httpbin.org/ip',
-                            'https://diagnostic.opendns.com/myip',
-                            'http://checkip.amazonaws.com',
-                            'https://api.ipify.org',
-                            'https://v4.ident.me']
-
+        self.server_list = json.load ('servers.json')
     def get_externalip(self):
         '''
         This function gets your IP from a random server
