@@ -93,7 +93,7 @@ class IPgetter(object):
                            ,expiryDisplay  = expiryDate.strftime('%Y-%m-%dT%H:%M:%S')
                            ,servers        = []
                            )
-            operUrl = urllib.urlopen("https://raw.githubusercontent.com/TheFlyingBadger/ipwatch/master/servers.json")
+            operUrl = urllib.urlopen("https://raw.githubusercontent.com/begleysm/ipwatch/master/servers.json")
             if(operUrl.getcode()==200):
                 data               = operUrl.read()
                 theList["servers"] = json.loads(data)
