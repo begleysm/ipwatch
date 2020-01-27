@@ -88,5 +88,10 @@ If you want to/need to run the cronjob as an unprivileged user you'll have to en
 ## Gmail
 If you use Gmail as your sending email service then you'll have to enable **Less secure app access** to allow ipwatch to send emails. You can read more about this at https://support.google.com/accounts/answer/6010255?hl=en.  You can enable **Less secure app access** by visiting https://myaccount.google.com/lesssecureapps.  Chances are you'll also be blocked, by Gmail, the first time you try try to send an email and will receive a **Critical security alert** saying that a **Sign-in attempt was blocked for your linked Google Account** at your recovery email/phone #.  You'll have to click the **Check activity** button and say **Yes that was me** in order to whitelist the *ipwatch* machine.
 
+## Server List
+The server list is hosted in this github repo as `servers.json`.  Locally, there is a cached copy kept which will be re-retrieved from github every 90 days.
+
 ## References
 The original ipgetter.py code came from https://github.com/phoemur/ipgetter.  However that repo is gone now.  This repo contains a copy of the ipgetter.py file for those who need it.  Additionally by keeping ipgetter.py in the same directory as ipwatch.py no additional Python installation efforts (for the ipgetter module) need be conducted.  The version of ipgetter.py in this repository has been updated to remove references to ip servers that no longer work.
+
+Thanks to TheFlyingBadger for adding in support for the GitHub hosted servers.json file.
