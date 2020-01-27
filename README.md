@@ -6,7 +6,7 @@ https://steamforge.net/wiki
 
 https://github.com/begleysm/ipwatch
 
-2019-11-19
+2020-01-27
 
 ## Description
 This program gets your external IP address, checks it against your "saved" IP address and, if a difference is found, emails you the new IP. This is useful for servers at residential locations whose IP address may change periodically due to actions by the ISP.
