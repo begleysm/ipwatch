@@ -32,6 +32,9 @@ as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
 import re
 import random
 import ssl
+import json
+import os 
+from datetime import datetime, timedelta
 
 from sys import version_info
 
@@ -61,46 +64,45 @@ class IPgetter(object):
     '''
 
     def __init__(self):
-        self.server_list = ['http://ip.dnsexit.com',
-                            'http://ifconfig.me/ip',
-                            'http://ipecho.net/plain',
-                            'http://checkip.dyndns.org/plain',
-                            'http://websiteipaddress.com/WhatIsMyIp',
-                            #'http://getmyipaddress.org/',
-                            'http://www.my-ip-address.net/',
-                            'http://myexternalip.com/raw',
-                            'http://www.canyouseeme.org/',
-                            'http://www.trackip.net/',
-                            'http://icanhazip.com/',
-                            #'http://www.iplocation.net/',
-                            'http://www.ipchicken.com/',
-                            'http://whatsmyip.net/',
-                            'http://www.ip-adress.com/',
-                            #'http://checkmyip.com/',
-                            'http://www.tracemyip.org/',
-                            'http://www.lawrencegoetz.com/programs/ipinfo/',
-                            #'http://www.findmyip.co/',
-                            'http://ip-lookup.net/',
-                            'http://www.mon-ip.com/en/my-ip/',
-                            'http://ipgoat.com/',
-                            'http://www.myipnumber.com/my-ip-address.asp',
-                            'http://formyip.com/',
-                            'https://check.torproject.org/',
-                            'http://www.displaymyip.com/',
-                            #'http://www.bobborst.com/tools/whatsmyip/',
-                            'http://www.geoiptool.com/',
-                            'https://www.whatsmydns.net/whats-my-ip-address.html',
-                            'https://www.privateinternetaccess.com/pages/whats-my-ip/',
-                            'http://checkip.dyndns.com/',
-                            'http://www.ip-adress.eu/',
-                            'http://www.infosniper.net/',
-                            'https://wtfismyip.com/text',
-                            #'http://ipinfo.io/',
-                            'http://httpbin.org/ip',
-                            'https://diagnostic.opendns.com/myip',
-                            'http://checkip.amazonaws.com',
-                            'https://api.ipify.org',
-                            'https://v4.ident.me']
+        JSON_FILENAME = 'serverCache.json'
+        now           = datetime.now()
+        currentTS     = datetime.timestamp(now)
+        theList       = None
+        if os.path.isfile(JSON_FILENAME):
+            try:
+                with open(JSON_FILENAME, 'r') as infile:
+                    theList   = json.load (infile)
+            except:
+                pass
+                
+        if (theList is None
+         or "expiry"         not in theList
+         or "expiryDisplay"  not in theList
+         or "servers"        not in theList
+         or theList["expiry"]         is None
+         or theList["expiryDisplay"]  is None
+         or theList["servers"]        is None
+         or not isinstance(theList["expiry"],float)
+         or len(str(theList["expiry"])) == 0
+         or not isinstance(theList["servers"],list)
+         or len(theList["servers"])     == 0
+         or theList["expiry"] < currentTS
+           ): # we will go off and get the list again
+            expiryDate = (now +  timedelta(days=90))
+            theList = dict (expiry         = datetime.timestamp(expiryDate)
+                           ,expiryDisplay  = expiryDate.strftime('%Y-%m-%dT%H:%M:%S')
+                           ,servers        = []
+                           )
+            operUrl = urllib.urlopen("https://raw.githubusercontent.com/TheFlyingBadger/ipwatch/master/servers.json")
+            if(operUrl.getcode()==200):
+                data               = operUrl.read()
+                theList["servers"] = json.loads(data)
+                with open(JSON_FILENAME, 'w') as outfile:
+                    outfile.write(json.dumps(theList, indent=4))
+            else:
+                print("Error receiving data", operUrl.getcode())
+        self.server_list = theList["servers"]
+        theList = None
 
     def get_externalip(self):
         '''
@@ -111,10 +113,8 @@ class IPgetter(object):
         for i in range(7):
             myip = self.fetch(random.choice(self.server_list))
             if myip != '':
-                return myip
-            else:
-                continue
-        return ''
+                break
+        return myip
 
     def fetch(self, server):
         '''
@@ -174,3 +174,4 @@ class IPgetter(object):
 
 if __name__ == '__main__':
     print(myip())
+
