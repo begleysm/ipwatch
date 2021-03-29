@@ -95,7 +95,7 @@ class IPgetter(object):
                            )
             operUrl = urllib.urlopen("https://raw.githubusercontent.com/begleysm/ipwatch/master/servers.json")
             if(operUrl.getcode()==200):
-                data               = operUrl.read()
+                data               = operUrl#.read() # commenting out .read() is an attempt to fix an error some users are having.  See issue 6
                 theList["servers"] = json.loads(data)
                 with open(JSON_FILENAME, 'w') as outfile:
                     outfile.write(json.dumps(theList, indent=4))
