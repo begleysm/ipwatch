@@ -23,7 +23,7 @@ This program gets your external IP address, checks it against your "saved" IP ad
 
 ## Installation
 ### Debian based Linux systems
-Install python3 and git by running
+Install python3, git, & nano by running
 ```bash
 sudo apt install python3 git nano
 ```
