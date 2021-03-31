@@ -18,12 +18,14 @@ This program gets your external IP address, checks it against your "saved" IP ad
 2. `./ipwatch.py [config]`
 3. `python3 ipwatch.py config.txt`
 4. `./ipwatch.py config.txt`
+5. `python3 /path/to/dir/ipwatch.py /path/to/dir/config.txt`
+6. `./path/to/dir/ipwatch.py /path/to/dir/config/txt`
 
 ## Installation
 ### Debian based Linux systems
 Install python3 and git by running
 ```bash
-sudo apt install python3 git
+sudo apt install python3 git nano
 ```
 
 Clone the ipwatch repo by running
