@@ -6,8 +6,8 @@
 #[config] = path to an IPWatch configuration file
 #
 #Sean Begley
-#2017-10-31
-# v0.4
+#2021-04-22
+# v0.5
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
