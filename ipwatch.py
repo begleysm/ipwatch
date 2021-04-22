@@ -66,7 +66,7 @@ class ConfigInfo:
 #help message print
 def printhelp():
     "Function to print out the help message"
-    print("""\r\nIPWatch v0.4 by Sean Begley (begleysm@gmail.com)
+    print("""\r\nIPWatch v0.5 by Sean Begley (begleysm@gmail.com)
 
 IPWatch is a tool to check your current external IP address against a saved, previous, external IP address.  It should be run as a scheduled task/cronjob periodically.  If a difference in the new vs old IP address is found it will dispatch an email describing the change.
 
@@ -218,6 +218,9 @@ def sendmail(oldip,  newip,  sender, sender_email, receiver, receiver_email, use
     message = ("""From: """ + sender + """ <"""+ sender_email + """>
 To: """ + receiver + """ <""" + receiver_email + """>
 Subject: """ + subject + """
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
 The IP address of """ + machine + """ has changed:
     Old IP = """ + oldip + """\r\n    New IP = """ + newip)
