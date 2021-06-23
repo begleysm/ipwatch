@@ -37,8 +37,8 @@ class ConfigInfo:
     sender_email = ""
     sender_username = ""
     sender_password = ""
-    receiver = ""
-    receiver_email = ""
+    receiver = []
+    receiver_email = []
     subject_line = ""
     machine = ""
     smtp_addr = ""
@@ -50,8 +50,8 @@ class ConfigInfo:
         self.sender_email = ""
         self.sender_username = ""
         self.sender_password = ""
-        self.receiver = ""
-        self.receiver_email = ""
+        self.receiver = []
+        self.receiver_email = []
         self.subject_line = ""
         self.machine = ""
         self.smtp_addr = ""
@@ -110,9 +110,15 @@ def readconfig(filepath,  configObj):
                 elif (param == "sender_password"):
                     configObj.sender_password = value
                 elif (param == "receiver"):
-                    configObj.receiver = value
+                    #get string of receivers, split into a list, strip leading spaces if present
+                    configObj.receiver = value.split(",")
+                    for i, item in enumerate(configObj.receiver):
+                        configObj.receiver[i] = item.lstrip()
                 elif (param == "receiver_email"):
-                    configObj.receiver_email = value
+                    #get string of receiver emails, split into a list, strip leading spaces if present
+                    configObj.receiver_email = value.split(",")
+                    for i, item in enumerate(configObj.receiver_email):
+                        configObj.receiver_email[i] = item.lstrip()
                 elif (param == "subject_line"):
                     configObj.subject_line = value
                 elif (param == "machine"):
@@ -127,6 +133,8 @@ def readconfig(filepath,  configObj):
                     configObj.ip_blacklist = value.split(',')
                 else:
                     print ("ERROR: unexpected line found in config file: %s" % line)
+                    configfile.close()
+                    return "badline"
 
         #print (configObj.sender)
         #print (configObj.sender_email)
@@ -143,10 +151,11 @@ def readconfig(filepath,  configObj):
 
         #close the file
         configfile.close()
+        return 0
 
     else:
+        print ("ERROR: config file not found")
         return "nofile"
-        #print ("file doesn't exist\r\n")
 
 #return the current external IP address
 def getip(try_count, blacklist):
@@ -212,12 +221,17 @@ def updateoldip(filepath,  newip):
     savefile.close()
 
 #send mail with new IP address
-def sendmail(oldip,  newip,  server, sender, sender_email, receiver, receiver_email, username, password, subject,  machine,  smtp_addr):
+def sendmail(oldip,  newip,  server, sender, sender_email, receivers, receiver_emails, username, password, subject,  machine,  smtp_addr):
     "Function to send an email with the new IP address"
-    receivers = [receiver_email]
+    
+    messages = [None]*len(receiver_emails)
+    error_flag = 0
 
-    message = ("""From: """ + sender + """ <"""+ sender_email + """>
-To: """ + receiver + """ <""" + receiver_email + """>
+    for i in range(len(receiver_emails)):
+        #print(str(i) + ": receiver = " + receivers[i] + "\t\t receiver email = " + receiver_emails[i])
+        
+        messages[i] = ("""From: """ + sender + """ <"""+ sender_email + """>
+To: """ + receivers[i] + """ <""" + receiver_emails[i] + """>
 Subject: """ + subject + """
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -226,25 +240,29 @@ Content-Transfer-Encoding: 7bit
 The IP address of """ + machine + """ has changed:
     Old IP = """ + oldip + """\r\n    New IP = """ + newip + """\r\n\r\nThe Server queried was """ + server)
 
-    #print (message)
-    #print (smtp_addr)
-    #print (username)
-    #print (password)
-    #print (sender)
-    #print (receivers)
-    #print (message)
-    try:
-        smtpObj = smtplib.SMTP(smtp_addr)
-        smtpObj.ehlo()
-        smtpObj.starttls()
-        smtpObj.login(username, password)
-        smtpObj.sendmail(sender_email, receivers, message)
-        smtpObj.quit()
-        print ("Successfully sent email")
-        return 0
-    except:
-        print ("ERROR: unable to send email")
+        #print (messages)
+        #print (smtp_addr)
+        #print (username)
+        #print (password)
+        #print (sender)
+        #print (receiver_emails)
+        #print (message)
+        try:
+            smtpObj = smtplib.SMTP(smtp_addr)
+            smtpObj.ehlo()
+            smtpObj.starttls()
+            smtpObj.login(username, password)
+            smtpObj.sendmail(sender_email, receiver_emails[i], messages[i])
+            smtpObj.quit()
+            print ("Successfully sent email " + str(i+1) + " of " + str(len(receiver_emails)) + " to " + receiver_emails[i])
+        except:
+            print ("ERROR: unable to send email " + str(i+1) + " of " + str(len(receiver_emails)) + " to " + receiver_emails[i])
+            error_flag = 1
+    
+    if (error_flag == 1):
         return 1
+    else:
+        return 0
 
 
 ################
@@ -263,7 +281,11 @@ else:
 
     #parse config file
     config = ConfigInfo()
-    readconfig(config_path, config)
+    rc_ret = readconfig(config_path, config)
+    if (rc_ret == "nofile"):
+        sys.exit(1)
+    elif (rc_ret == "badline"):
+        sys.exit(2)
 
     #print (config.sender)
     #print (config.sender_email)
@@ -301,6 +323,8 @@ else:
 
     else:
         print ("Current IP = Old IP.  No need to send email.")
+    
+    sys.exit(0)
 
 
 

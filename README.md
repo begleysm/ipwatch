@@ -6,7 +6,7 @@ https://steamforge.net/wiki
 
 https://github.com/begleysm/ipwatch
 
-2020-01-27
+2020-06-23
 
 ## Description
 This program gets your external IP address, checks it against your "saved" IP address and, if a difference is found, emails you the new IP. This is useful for servers at residential locations whose IP address may change periodically due to actions by the ISP.
@@ -58,18 +58,18 @@ Check out the **Cronjob** section below to make this utility run on its own so t
 ipwatch uses a config file to define how to send an email.  An example and description is below.  A similar config file is in the repo as example_config.txt.  You should copy it by running something like `sudo cp example_config.txt config.txt` and then modify `config.txt`. It is recommended that you adjust the permissions of your config file so that no one but you and/or root can read it since it will contain the sender email password.
 
 ```bash
-sender=Bob Sender                    #this is the name of the email sender
-sender_email=bobsender@gmail.com     #this is the email address the email will be sent from
-sender_username=bobsender            #this is the username (in this example gmail username) of the sender
-sender_password=password1            #this is the password (in this example gmail password) of the sender
-receiver=Tom Receiver                #this is the name of the recipient
-receiver_email=tomreceiver@gmail.com #this is the email address of the recipient
-subject_line=My IP Has Changed!      #this is the subject line of the sent email
-machine=Test_Machine                 #this is the name of the machine sending the email
-smtp_addr=smtp.gmail.com:587         #this is the SMTP address for the sending email server (in this case gmail)
-save_ip_path=/opt/ipwatch/oldip.txt  #this is the location where the saved ip address will be stored
-try_count=10                         #this defines how many times the system will try to find the current IP before exiting
-ip_blacklist=192.168.0.255,192.168.0.1,192.168.1.255,192.168.1.1  #this is a list of IP address to ignore if received
+sender=Bob Sender                    								#this is the name of the email sender
+sender_email=bobsender@gmail.com     								#this is the email address the email will be sent from
+sender_username=bobsender            								#this is the username (in this example gmail username) of the sender
+sender_password=password1            								#this is the password (in this example gmail password) of the sender
+receiver=Tom Receiver, Bob Receiver									#this is a comma delimited list of the names of the recipients
+receiver_email=tomreceiver@gmail.com, bobreceiver@gmail.com  		#this is a comma delimited lit of the the email addresses of the recipients
+subject_line=My IP Has Changed!      								#this is the subject line of the sent email
+machine=Test_Machine                 								#this is the name of the machine sending the email
+smtp_addr=smtp.gmail.com:587         								#this is the SMTP address for the sending email server (in this case gmail)
+save_ip_path=/opt/ipwatch/oldip.txt  								#this is the location where the saved ip address will be stored
+try_count=10                         								#this defines how many times the system will try to find the current IP before exiting
+ip_blacklist=192.168.0.255,192.168.0.1,192.168.1.255,192.168.1.1	#this is a list of IP address to ignore if received
 ```
 
 ## Cronjob
@@ -94,6 +94,6 @@ If you use Gmail as your sending email service then you'll have to enable **Less
 The server list is hosted in this github repo as `servers.json`.  Locally, there is a cached copy kept which will be re-retrieved from github every 90 days.
 
 ## References
-The original ipgetter.py code came from https://github.com/phoemur/ipgetter.  However that repo is gone now.  This repo contains a copy of the ipgetter.py file for those who need it.  Additionally by keeping ipgetter.py in the same directory as ipwatch.py no additional Python installation efforts (for the ipgetter module) need be conducted.  The version of ipgetter.py in this repository has been updated to remove references to ip servers that no longer work.
+The original ipgetter.py code came from https://github.com/phoemur/ipgetter.  However that repo is gone now.  This repo contains an updated copy of the ipgetter.py file that has been modified to further support ipwatch.
 
 Thanks to TheFlyingBadger for adding in support for the GitHub hosted servers.json file.
