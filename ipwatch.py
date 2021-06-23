@@ -7,7 +7,7 @@
 #
 #Sean Begley
 #2021-06-23
-# v0.7
+# v0.8
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
@@ -249,9 +249,9 @@ The IP address of """ + machine + """ has changed:
         #print (message)
         try:
             smtpObj = smtplib.SMTP(smtp_addr)
-            smtpObj.ehlo()
             smtpObj.starttls()
             smtpObj.login(username, password)
+            smtpObj.ehlo(name=machine)
             smtpObj.sendmail(sender_email, receiver_emails[i], messages[i])
             smtpObj.quit()
             print ("Successfully sent email " + str(i+1) + " of " + str(len(receiver_emails)) + " to " + receiver_emails[i])
