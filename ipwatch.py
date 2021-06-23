@@ -6,8 +6,8 @@
 #[config] = path to an IPWatch configuration file
 #
 #Sean Begley
-#2021-04-22
-# v0.5
+#2021-06-23
+# v0.6
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
@@ -240,8 +240,10 @@ The IP address of """ + machine + """ has changed:
         smtpObj.sendmail(sender_email, receivers, message)
         smtpObj.quit()
         print ("Successfully sent email")
+        return 0
     except:
         print ("ERROR: unable to send email")
+        return 1
 
 
 ################
@@ -285,10 +287,15 @@ else:
     if (currip != oldip):
         #send email
         print ("Current IP differs from old IP.")
-        sendmail(oldip,  currip,  config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
+        sm_ret = sendmail(oldip,  currip,  config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
 
-        #update file
-        updateoldip(config.save_ip_path,  currip)
+        # only update the file if the email was successfully sent
+        if (sm_ret == 0):
+            #update file
+            updateoldip(config.save_ip_path,  currip)
+            print ("Saved IP address updated.")
+        else:
+            print ("Saved IP address NOT updated.")
 
     else:
         print ("Current IP = Old IP.  No need to send email.")
