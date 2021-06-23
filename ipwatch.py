@@ -7,7 +7,7 @@
 #
 #Sean Begley
 #2021-06-23
-# v0.6
+# v0.7
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
@@ -159,7 +159,7 @@ def getip(try_count, blacklist):
     while(good_ip == 0) and(counter < try_count):
         
         #get an IP
-        currip = ipgetter.myip()
+        currip,server = ipgetter.myip()
         
         #check to see that it has a ###.###.###.### format
         if pattern.match(currip) and currip not in blacklist:
@@ -175,7 +175,8 @@ def getip(try_count, blacklist):
         counter = counter + 1
         
     #print ("My IP = %s\r\n" % currip)
-    return currip
+    #print ("Server used = %s\r\n" % server)
+    return currip,server
 
 #get old IP address
 def getoldip(filepath):
@@ -211,7 +212,7 @@ def updateoldip(filepath,  newip):
     savefile.close()
 
 #send mail with new IP address
-def sendmail(oldip,  newip,  sender, sender_email, receiver, receiver_email, username, password, subject,  machine,  smtp_addr):
+def sendmail(oldip,  newip,  server, sender, sender_email, receiver, receiver_email, username, password, subject,  machine,  smtp_addr):
     "Function to send an email with the new IP address"
     receivers = [receiver_email]
 
@@ -223,7 +224,7 @@ Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
 The IP address of """ + machine + """ has changed:
-    Old IP = """ + oldip + """\r\n    New IP = """ + newip)
+    Old IP = """ + oldip + """\r\n    New IP = """ + newip + """\r\n\r\nThe Server queried was """ + server)
 
     #print (message)
     #print (smtp_addr)
@@ -280,14 +281,15 @@ else:
     #print ("Old IP = %s" % oldip)
 
     #get current, external, IP address
-    currip = getip(int(config.try_count), config.ip_blacklist)
+    currip,server = getip(int(config.try_count), config.ip_blacklist)
     #print ("Curr IP = %s" % currip)
+    #print ("Server used = %s" % server)
 
     #check to see if the IP address has changed
     if (currip != oldip):
         #send email
         print ("Current IP differs from old IP.")
-        sm_ret = sendmail(oldip,  currip,  config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
+        sm_ret = sendmail(oldip,  currip,  server, config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
 
         # only update the file if the email was successfully sent
         if (sm_ret == 0):

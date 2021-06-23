@@ -5,8 +5,6 @@ It is used mostly when behind a NAT.
 It picks your IP randomly from a serverlist to minimize request
 overhead on a single server
 
-If you want to add or remove your server from the list contact me on github
-
 
 API Usage
 =========
@@ -27,6 +25,8 @@ Copyright 2014 phoemur@gmail.com
 This work is free. You can redistribute it and/or modify it under the
 terms of the Do What The Fuck You Want To Public License, Version 2,
 as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+
+Updated by Sean Begley for the ipwatch project (https://github.com/begleysm/ipwatch/)
 """
 
 import re
@@ -111,10 +111,11 @@ class IPgetter(object):
 
         myip = ''
         for i in range(7):
-            myip = self.fetch(random.choice(self.server_list))
+            server = random.choice(self.server_list)
+            myip = self.fetch(server)
             if myip != '':
                 break
-        return myip
+        return myip,server
 
     def fetch(self, server):
         '''
