@@ -6,8 +6,8 @@
 #[config] = path to an IPWatch configuration file
 #
 #Sean Begley
-#2021-06-23
-# v0.8
+#2021-07-19
+# v0.9
 #
 #This program gets for your external IP address
 #checks it against your "saved" IP address and,
@@ -226,6 +226,8 @@ def sendmail(oldip,  newip,  server, sender, sender_email, receivers, receiver_e
     
     messages = [None]*len(receiver_emails)
     error_flag = 0
+    
+    print("")
 
     for i in range(len(receiver_emails)):
         #print(str(i) + ": receiver = " + receivers[i] + "\t\t receiver email = " + receiver_emails[i])
@@ -254,9 +256,10 @@ The IP address of """ + machine + """ has changed:
             smtpObj.ehlo(name=machine)
             smtpObj.sendmail(sender_email, receiver_emails[i], messages[i])
             smtpObj.quit()
-            print ("Successfully sent email " + str(i+1) + " of " + str(len(receiver_emails)) + " to " + receiver_emails[i])
-        except:
+            print ("Successfully sent email " + str(i+1) + " of " + str(len(receiver_emails)) + " to " + receiver_emails[i] + "\r\n")
+        except Exception as ex:
             print ("ERROR: unable to send email " + str(i+1) + " of " + str(len(receiver_emails)) + " to " + receiver_emails[i])
+            print ("EXCEPTION: " + str(ex) + "\r\n")
             error_flag = 1
     
     if (error_flag == 1):
