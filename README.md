@@ -6,7 +6,7 @@ https://steamforge.net/wiki
 
 https://github.com/begleysm/ipwatch
 
-2020-06-23
+2021-08-03
 
 ## Description
 This program gets your external IP address, checks it against your "saved" IP address and, if a difference is found, emails you the new IP. This is useful for servers at residential locations whose IP address may change periodically due to actions by the ISP.
@@ -58,17 +58,17 @@ Check out the **Cronjob** section below to make this utility run on its own so t
 ipwatch uses a config file to define how to send an email.  An example and description is below.  A similar config file is in the repo as example_config.txt.  You should copy it by running something like `sudo cp example_config.txt config.txt` and then modify `config.txt`. It is recommended that you adjust the permissions of your config file so that no one but you and/or root can read it since it will contain the sender email password.
 
 ```bash
-sender=Bob Sender                    								#this is the name of the email sender
-sender_email=bobsender@gmail.com     								#this is the email address the email will be sent from
-sender_username=bobsender            								#this is the username (in this example gmail username) of the sender
-sender_password=password1            								#this is the password (in this example gmail password) of the sender
-receiver=Tom Receiver, Bob Receiver									#this is a comma delimited list of the names of the recipients
+sender=Bob Sender                    					#this is the name of the email sender
+sender_email=bobsender@gmail.com     					#this is the email address the email will be sent from
+sender_username=bobsender            					#this is the username (in this example gmail username) of the sender
+sender_password=password1            					#this is the password (in this example gmail password) of the sender
+receiver=Tom Receiver, Bob Receiver					#this is a comma delimited list of the names of the recipients
 receiver_email=tomreceiver@gmail.com, bobreceiver@gmail.com  		#this is a comma delimited lit of the the email addresses of the recipients
-subject_line=My IP Has Changed!      								#this is the subject line of the sent email
-machine=Test_Machine                 								#this is the name of the machine sending the email
-smtp_addr=smtp.gmail.com:587         								#this is the SMTP address for the sending email server (in this case gmail)
-save_ip_path=/opt/ipwatch/oldip.txt  								#this is the location where the saved ip address will be stored
-try_count=10                         								#this defines how many times the system will try to find the current IP before exiting
+subject_line=My IP Has Changed!      					#this is the subject line of the sent email
+machine=Test_Machine                 					#this is the name of the machine sending the email
+smtp_addr=smtp.gmail.com:587         					#this is the SMTP address for the sending email server (in this case gmail)
+save_ip_path=/opt/ipwatch/oldip.txt  					#this is the location where the saved ip address will be stored
+try_count=10                         					#this defines how many times the system will try to find the current IP before exiting
 ip_blacklist=192.168.0.255,192.168.0.1,192.168.1.255,192.168.1.1	#this is a list of IP address to ignore if received
 ```
 
@@ -88,7 +88,12 @@ Below is an example crontab entry to run ipwatch once per hour.
 If you want to/need to run the cronjob as an unprivileged user you'll have to ensure that your user has execution privileges for `ipwatch.py` and can write to the `save_ip_path` file defined in your config file.  This is probably most easily accomplished by installing *ipwatch* somewhere under your home directory.
 
 ## Gmail
-If you use Gmail as your sending email service then you'll have to enable **Less secure app access** to allow ipwatch to send emails. You can read more about this at https://support.google.com/accounts/answer/6010255?hl=en.  You can enable **Less secure app access** by visiting https://myaccount.google.com/lesssecureapps.  Chances are you'll also be blocked, by Gmail, the first time you try try to send an email and will receive a **Critical security alert** saying that a **Sign-in attempt was blocked for your linked Google Account** at your recovery email/phone #.  You'll have to click the **Check activity** button and say **Yes that was me** in order to whitelist the *ipwatch* machine.
+### Less secure app access
+If you use Gmail as your sending email service then you'll have to enable **Less secure app access** to allow ipwatch to send emails. You can read more about this at https://support.google.com/accounts/answer/6010255.  You can enable **Less secure app access** by visiting https://myaccount.google.com/lesssecureapps.
+### Critical security alert
+Chances are you'll also be blocked, by Gmail, the first time you try try to send an email and will receive a **Critical security alert** saying that a **Sign-in attempt was blocked for your linked Google Account** at your recovery email/phone #.  You'll have to click the **Check activity** button and say **Yes that was me** in order to whitelist the *ipwatch* machine.
+### 2-Step Verification
+If you use **2-Step Verification** with Gmail then you'll need configure your Gmail account to **Sign in with App Passwords** which you can learn more about by visiting https://support.google.com/accounts/answer/185833.
 
 ## Server List
 The server list is hosted in this github repo as `servers.json`.  Locally, there is a cached copy kept which will be re-retrieved from github every 90 days.
