@@ -31,6 +31,7 @@ Updated by Sean Begley for the ipwatch project (https://github.com/begleysm/ipwa
 
 import re
 import random
+import socket
 import ssl
 import json
 import os 
@@ -51,7 +52,8 @@ __version__ = "0.7"
 
 
 def myip():
-    return IPgetter().get_externalip()
+    return IPgetter().get_ips()
+
 
 
 class IPgetter(object):
@@ -104,6 +106,7 @@ class IPgetter(object):
         self.server_list = theList["servers"]
         theList = None
 
+        
     def get_externalip(self):
         '''
         This function gets your IP from a random server
@@ -116,6 +119,27 @@ class IPgetter(object):
             if myip != '':
                 break
         return myip,server
+    
+    
+    def get_local_ip(self):
+        # From https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.255.255.255', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
+    
+    
+    def get_ips(self):
+        local_ip = self.get_local_ip()
+        external_ip, server = self.get_externalip()
+        return external_ip, local_ip, server
+    
 
     def fetch(self, server):
         '''
