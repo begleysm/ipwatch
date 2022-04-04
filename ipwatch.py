@@ -158,7 +158,7 @@ def readconfig(filepath,  configObj):
         return "nofile"
 
 #return the current external IP address
-def getip(try_count, blacklist):
+def getips(try_count, blacklist):
     "Function to return the current, external, IP address"
     good_ip = 0
     counter = 0
@@ -168,27 +168,27 @@ def getip(try_count, blacklist):
     while(good_ip == 0) and(counter < try_count):
         
         #get an IP
-        currip,server = ipgetter.myip()
+        external_ip, local_ip, server = ipgetter.myip()
         
         #check to see that it has a ###.###.###.### format
-        if pattern.match(currip) and currip not in blacklist:
+        if pattern.match(external_ip) and external_ip not in blacklist:
             good_ip = 1
-            print ("GetIP: Try %d: Good IP: %s" % (counter+1, currip))
+            print ("GetIP: Try %d: Good IP: %s" % (counter+1, external_ip))
         else:
-            if currip in blacklist:
-                print ("GetIP: Try %d:  Bad IP (in Blacklist): %s" % (counter+1, currip))
+            if external_ip in blacklist:
+                print ("GetIP: Try %d:  Bad IP (in Blacklist): %s" % (counter+1, external_ip))
             else:
-                print ("GetIP: Try %d:  Bad IP    (malformed): %s" % (counter+1, currip))
+                print ("GetIP: Try %d:  Bad IP    (malformed): %s" % (counter+1, external_ip))
         
         #increment the counter
         counter = counter + 1
         
-    #print ("My IP = %s\r\n" % currip)
+    #print ("My IP = %s\r\n" % external_ip)
     #print ("Server used = %s\r\n" % server)
-    return currip,server
+    return external_ip, local_ip, server
 
 #get old IP address
-def getoldip(filepath):
+def getoldips(filepath):
     "Function to get the old ip address from savefile"
     #check if the savefile exists
     if Path(filepath).is_file():
@@ -196,32 +196,44 @@ def getoldip(filepath):
         savefile = open(filepath, "r")
 
         #check if the content of savefile makes sense
-        oldip = savefile.read(15).rstrip()
+        with open(filepath, "r") as infile:
+            old_text = [line.strip() for line in infile]
+            if len(old_text) > 1:
+                old_external_ip = old_text[0].rstrip()
+                old_local_ip = old_text[1].rstrip()
+            else:
+                savefile.close()
+                return "malformed", "malformed"
+#         oldip = savefile.read(15).rstrip()
         pattern = re.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
-        if (pattern.match(oldip)):
+        if (pattern.match(old_external_ip) and pattern.match(old_local_ip)):
             savefile.close()
-            return oldip
+            return old_external_ip, old_local_ip
             #print ("oldip = %s\r\n" % oldip)
         else:
             savefile.close()
-            return "malformed"
+            return "malformed", "malformed"
             #print ("malformed IP or empty file: ignoring\r\n")
     else:
-        return "nofile"
+        return "nofile", "nofile"
         #print ("file doesn't exist\r\n")
 
+
 #write the new IP address to file
-def updateoldip(filepath,  newip):
+def updateoldips(filepath,  new_external_ip, new_local_ip):
     "Function to update the old ip address from savefile"
     #open savefile
     savefile = open(filepath, "w")
 
     #write new ip
-    savefile.write(newip)
+    savefile.write(new_external_ip)
+    savefile.write("\n")
+    savefile.write(new_local_ip)
     savefile.close()
 
 #send mail with new IP address
-def sendmail(oldip,  newip,  server, sender, sender_email, receivers, receiver_emails, username, password, subject,  machine,  smtp_addr):
+def sendmail(old_exernal_ip, old_local_ip, new_external_ip, new_local_ip, server, sender, 
+             sender_email, receivers, receiver_emails, username, password, subject,  machine,  smtp_addr):
     "Function to send an email with the new IP address"
     
     messages = [None]*len(receiver_emails)
@@ -239,8 +251,10 @@ Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-The IP address of """ + machine + """ has changed:
-    Old IP = """ + oldip + """\r\n    New IP = """ + newip + """\r\n\r\nThe Server queried was """ + server)
+The IP address of """ + machine + """ has changed:\nOld external IP = """ + old_external_ip + """\r\nOld local IP = """
+                       + old_local_ip + """\r\nNew external IP = """ + new_external_ip + """\r\nNew local IP = """ +
+                       new_local_ip + """\r\nThe Server queried was """ + server)
+
 
         #print (messages)
         #print (smtp_addr)
@@ -302,24 +316,24 @@ else:
     #print (config.save_ip_path)
 
     #get the old ip address
-    oldip = getoldip(config.save_ip_path)
+    old_external_ip, old_local_ip = getoldips(config.save_ip_path)
     #print ("Old IP = %s" % oldip)
 
     #get current, external, IP address
-    currip,server = getip(int(config.try_count), config.ip_blacklist)
-    #print ("Curr IP = %s" % currip)
+    curr_external_ip, curr_local_ip, server = getips(int(config.try_count), config.ip_blacklist)
+    #print ("Curr IP = %s" % external_ip)
     #print ("Server used = %s" % server)
 
     #check to see if the IP address has changed
-    if (currip != oldip):
+    if ((curr_external_ip != old_external_ip) or (curr_local_ip != old_local_ip)):
         #send email
         print ("Current IP differs from old IP.")
-        sm_ret = sendmail(oldip,  currip,  server, config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
+        sm_ret = sendmail(old_external_ip, old_local_ip, curr_external_ip, curr_local_ip, server, config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
 
         # only update the file if the email was successfully sent
         if (sm_ret == 0):
             #update file
-            updateoldip(config.save_ip_path,  currip)
+            updateoldips(config.save_ip_path,  curr_external_ip, curr_local_ip)
             print ("Saved IP address updated.")
         else:
             print ("Saved IP address NOT updated.")
