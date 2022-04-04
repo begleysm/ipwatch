@@ -6,10 +6,10 @@ https://steamforge.net/wiki
 
 https://github.com/begleysm/ipwatch
 
-2021-08-03
+2022-04-04
 
 ## Description
-This program gets your external IP address, checks it against your "saved" IP address and, if a difference is found, emails you the new IP. This is useful for servers at residential locations whose IP address may change periodically due to actions by the ISP.
+This program gets your external & internal IP addresses, checks them against your "saved" IP addresses and, if a difference is found, emails you the new IP's. This is useful for servers at residential locations whose IP address may change periodically due to actions by the ISP.
 
 ## Usage Examples
 [config] = path to an IPWatch configuration file
@@ -101,4 +101,7 @@ The server list is hosted in this github repo as `servers.json`.  Locally, there
 ## References
 The original ipgetter.py code came from https://github.com/phoemur/ipgetter.  However that repo is gone now.  This repo contains an updated copy of the ipgetter.py file that has been modified to further support ipwatch.
 
-Thanks to TheFlyingBadger for adding in support for the GitHub hosted servers.json file.
+## Thanks
+1. Thanks to TheFlyingBadger for adding in support for the GitHub hosted servers.json file.
+2. Thanks to pjuster for providing info on Gmail 2-Step Verification.
+3. Thanks to carolmanderson for adding in support for monitoring local IP.
