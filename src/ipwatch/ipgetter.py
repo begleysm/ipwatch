@@ -1,7 +1,7 @@
 """
 This module is designed to fetch your external IP address from the internet.
 It is used mostly when behind a NAT.
-It picks your IP randomly from a serverlist to minimize request
+It picks your IP randomly from a server list to minimize request
 overhead on a single server
 
 
@@ -45,63 +45,85 @@ __version__ = "0.7"
 def myip():
     return IPgetter().get_ips()
 
-SERVERLIST_URL = "https://raw.githubusercontent.com/begleysm/ipwatch/master/servers.json"
+class CacheExpired(Exception):
+    pass
+
+class ServerList:
+    URL = "https://raw.githubusercontent.com/begleysm/ipwatch/master/servers.json"
+
+    def __init__(self, file = None, url = URL):
+        try:
+            self.server_list = self.from_cache()
+        except CacheExpired:
+            self.server_list = self.from_file(file) if file else self.download(url)
+            self.to_cache()
+
+    def __iter__(self):
+        return iter(self.server_list)
+
+    def __len__(self):
+         return len(self.server_list)
+
+    def download(self, url):
+        with urllib.urlopen(url) as f:
+            data = f.read().decode("utf-8")
+            return json.loads(data)
+
+    def from_file(self, file):
+        with open(file) as f:
+            data = f.read().decode("utf-8")
+            return json.loads(data)
+
+    def to_cache(self):
+        expiry_date = datetime.now() + timedelta(days=90)
+        cache_content = {
+            "expiry" : datetime.timestamp(expiry_date),
+            "expiryDisplay" : expiry_date.strftime("%Y-%m-%dT%H:%M:%S"),
+            "servers" : self.server_list,
+        }
+
+        servercache_file = platformdirs.user_cache_path() / "serverCache.json"
+        with open(servercache_file, "w") as outfile:
+            outfile.write(json.dumps(cache_content, indent=4))
+
+    def from_cache(self):
+        now = datetime.now()
+        current_ts = datetime.timestamp(now)
+        servercache_file = platformdirs.user_cache_path() / "serverCache.json"
+        if os.path.isfile(servercache_file):
+            try:
+                with open(servercache_file) as infile:
+                    cache_content = json.load(infile)
+            except:
+                pass
+
+        if (
+            cache_content is None
+            or "expiry" not in cache_content
+            or "expiryDisplay" not in cache_content
+            or "servers" not in cache_content
+            or cache_content["expiry"] is None
+            or cache_content["expiryDisplay"] is None
+            or cache_content["servers"] is None
+            or not isinstance(cache_content["expiry"], float)
+            or len(str(cache_content["expiry"])) == 0
+            or not isinstance(cache_content["servers"], list)
+            or len(cache_content["servers"]) == 0
+            or cache_content["expiry"] < current_ts
+        ):
+            raise CacheExpired()
+
+        return cache_content["servers"]
 
 class IPgetter:
     """
     This class is designed to fetch your external IP address from the internet.
     It is used mostly when behind a NAT.
-    It picks your IP randomly from a serverlist to minimize request overhead
+    It picks your IP randomly from a server_list to minimize request overhead
     on a single server
     """
-
-    def __init__(self, serverlist_file = None):
-        servercache_file = platformdirs.user_cache_path() / "serverCache.json"
-        now = datetime.now()
-        current_ts = datetime.timestamp(now)
-        self.serverlist = self.get_serverlist(serverlist_file)
-
-    def get_serverlist(serverlist_file = None)
-        server_list = None
-        if os.path.isfile(servercache_file):
-            try:
-                with open(servercache_file) as infile:
-                    server_list = json.load(infile)
-            except:
-                pass
-
-        if (
-            server_list is None
-            or "expiry" not in server_list
-            or "expiryDisplay" not in server_list
-            or "servers" not in server_list
-            or server_list["expiry"] is None
-            or server_list["expiryDisplay"] is None
-            or server_list["servers"] is None
-            or not isinstance(server_list["expiry"], float)
-            or len(str(server_list["expiry"])) == 0
-            or not isinstance(server_list["servers"], list)
-            or len(server_list["servers"]) == 0
-            or server_list["expiry"] < current_ts
-        ):  # we will go off and get the list again
-            expiry_date = now + timedelta(days=90)
-            server_list = {
-                "expiry" : datetime.timestamp(expiry_date),
-                "expiryDisplay" : expiry_date.strftime("%Y-%m-%dT%H:%M:%S"),
-                "servers" : [],
-            }
-
-            f = urllib.urlopen(SERVERLIST_URL)
-
-            if f.getcode() == 200:
-                data = f.read().decode("utf-8")
-                server_list["servers"] = json.loads(data)
-                with open(servercache_file, "w") as outfile:
-                    outfile.write(json.dumps(server_list, indent=4))
-            else:
-                raise urllib.error.HTTPError("Error receiving data", f.getcode())
-
-        return server_list["servers"]
+    def __init__(self, server_list = None):
+        self.server_list = server_list if server_list else ServerList()
 
     def get_externalip(self):
         """
@@ -191,7 +213,7 @@ class IPgetter:
 
         resultdict = {
             server : self.fetch(server)
-            for server in self.server_list
+            for server in ServerList()
         }
 
         print("Number of servers: ", len(self.server_list))
