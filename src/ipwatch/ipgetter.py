@@ -55,10 +55,13 @@ class IPgetter:
     on a single server
     """
 
-    def __init__(self):
+    def __init__(self, serverlist_file = None):
         servercache_file = platformdirs.user_cache_path() / "serverCache.json"
         now = datetime.now()
         current_ts = datetime.timestamp(now)
+        self.serverlist = self.get_serverlist(serverlist_file)
+
+    def get_serverlist(serverlist_file = None)
         server_list = None
         if os.path.isfile(servercache_file):
             try:
@@ -98,7 +101,7 @@ class IPgetter:
             else:
                 raise urllib.error.HTTPError("Error receiving data", f.getcode())
 
-        self.server_list = server_list["servers"]
+        return server_list["servers"]
 
     def get_externalip(self):
         """
