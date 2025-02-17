@@ -34,7 +34,7 @@ import random
 import socket
 import ssl
 import json
-import os 
+import os
 from datetime import datetime, timedelta
 
 from sys import version_info
@@ -76,7 +76,7 @@ class IPgetter(object):
                     theList   = json.load (infile)
             except:
                 pass
-                
+
         if (theList is None
          or "expiry"         not in theList
          or "expiryDisplay"  not in theList
@@ -106,7 +106,7 @@ class IPgetter(object):
         self.server_list = theList["servers"]
         theList = None
 
-        
+
     def get_externalip(self):
         '''
         This function gets your IP from a random server
@@ -119,8 +119,8 @@ class IPgetter(object):
             if myip != '':
                 break
         return myip,server
-    
-    
+
+
     def get_local_ip(self):
         # From https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -133,13 +133,13 @@ class IPgetter(object):
         finally:
             s.close()
         return IP
-    
-    
+
+
     def get_ips(self):
         local_ip = self.get_local_ip()
         external_ip, server = self.get_externalip()
         return external_ip, local_ip, server
-    
+
 
     def fetch(self, server):
         '''
@@ -197,6 +197,9 @@ class IPgetter(object):
         print('\n')
         print(resultdict)
 
-if __name__ == '__main__':
+def main():
     print(myip())
+
+if __name__ == '__main__':
+    main()
 

@@ -11,33 +11,42 @@ https://github.com/begleysm/ipwatch
 ## Description
 This program gets your external & internal IP addresses, checks them against your "saved" IP addresses and, if a difference is found, emails you the new IP's. This is useful for servers at residential locations whose IP address may change periodically due to actions by the ISP.
 
-## Usage Examples
-[config] = path to an IPWatch configuration file
-
-1. `python3 ipwatch.py [config]`
-2. `./ipwatch.py [config]`
-3. `python3 ipwatch.py config.txt`
-4. `./ipwatch.py config.txt`
-5. `python3 /path/to/dir/ipwatch.py /path/to/dir/config.txt`
-6. `./path/to/dir/ipwatch.py /path/to/dir/config/txt`
-
 ## Installation
-### Debian based Linux systems
-Install python3, git, & nano by running
+
+### Install python3, git and optionally nano
+
+On Debian-based system (e.g. Ubuntu) you can do:
+
 ```bash
 sudo apt install python3 git nano
 ```
 
-Clone the ipwatch repo by running
+## Create a Python virtual environment (venv)
+
 ```bash
-sudo git clone https://github.com/begleysm/ipwatch /opt/ipwatch
+sudo python3 -m venv /opt/ipwatch
+```
+
+## Install the ipwatch package in this venv
+
+Clone the ipwatch repo by running
+
+```bash
+git clone https://github.com/begleysm/ipwatch
+```
+
+Install the package in the venv
+
+```bash
+. /opt/ipwatch/bin/activate
+cd ipwatch
+pip install
 ```
 
 Copy `example_config.txt` to `config.txt` by running
 ```bash
-sudo cp /opt/ipwatch/example_config.txt /opt/ipwatch/config.txt
+sudo cp example_config.txt /opt/ipwatch/config.txt
 ```
-
 Since `config.txt` will contain an email password, make it viewable & editable by `root` only by running
 ```bash
 sudo chmod 600 /opt/ipwatch/config.txt
@@ -50,9 +59,20 @@ sudo nano /opt/ipwatch/config.txt
 
 You can test the setup by running
 ```bash
-sudo python3 /opt/ipwatch/ipwatch.py /opt/ipwatch/config.txt
+sudo /opt/ipwatch/bin/ipwatch /opt/ipwatch/config.txt
 ```
+
 Check out the **Cronjob** section below to make this utility run on its own so that you may be quickly alerted to any IP changes on your system.
+
+## Usage
+
+[config] = path to an IPWatch configuration file
+
+```bash
+. /opt/ipwatch/bin/activate
+ipwatch [config]
+
+```
 
 ## Config File
 ipwatch uses a config file to define how to send an email.  An example and description is below.  A similar config file is in the repo as example_config.txt.  You should copy it by running something like `sudo cp example_config.txt config.txt` and then modify `config.txt`. It is recommended that you adjust the permissions of your config file so that no one but you and/or root can read it since it will contain the sender email password.
@@ -70,6 +90,7 @@ smtp_addr=smtp.gmail.com:587         					#this is the SMTP address for the send
 save_ip_path=/opt/ipwatch/oldip.txt  					#this is the location where the saved ip address will be stored
 try_count=10                         					#this defines how many times the system will try to find the current IP before exiting
 ip_blacklist=192.168.0.255,192.168.0.1,192.168.1.255,192.168.1.1	#this is a list of IP address to ignore if received
+dry_run=0                                               # do not send email when dry_run=1
 ```
 
 ## Cronjob

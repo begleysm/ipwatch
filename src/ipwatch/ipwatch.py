@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 import re
 import smtplib
-import ipgetter
+from . import ipgetter
 
 
 ################
@@ -131,6 +131,8 @@ def readconfig(filepath,  configObj):
                     configObj.try_count = value
                 elif (param == "ip_blacklist"):
                     configObj.ip_blacklist = value.split(',')
+                elif (param == "dry_run"):
+                    configObj.dry_run = bool(int(value))
                 else:
                     print ("ERROR: unexpected line found in config file: %s" % line)
                     configfile.close()
@@ -163,13 +165,13 @@ def getips(try_count, blacklist):
     good_ip = 0
     counter = 0
     pattern = re.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
-    
+
     #try up to config.try_count servers for an IP
     while(good_ip == 0) and(counter < try_count):
-        
+
         #get an IP
         external_ip, local_ip, server = ipgetter.myip()
-        
+
         #check to see that it has a ###.###.###.### format
         if pattern.match(external_ip) and external_ip not in blacklist:
             good_ip = 1
@@ -179,10 +181,10 @@ def getips(try_count, blacklist):
                 print ("GetIP: Try %d:  Bad IP (in Blacklist): %s" % (counter+1, external_ip))
             else:
                 print ("GetIP: Try %d:  Bad IP    (malformed): %s" % (counter+1, external_ip))
-        
+
         #increment the counter
         counter = counter + 1
-        
+
     #print ("My IP = %s\r\n" % external_ip)
     #print ("Server used = %s\r\n" % server)
     return external_ip, local_ip, server
@@ -232,18 +234,19 @@ def updateoldips(filepath,  new_external_ip, new_local_ip):
     savefile.close()
 
 #send mail with new IP address
-def sendmail(old_exernal_ip, old_local_ip, new_external_ip, new_local_ip, server, sender, 
-             sender_email, receivers, receiver_emails, username, password, subject,  machine,  smtp_addr):
+def sendmail(old_external_ip, old_local_ip, new_external_ip, new_local_ip, server, sender,
+             sender_email, receivers, receiver_emails, username, password, subject,  machine,  smtp_addr,
+             dry_run = False):
     "Function to send an email with the new IP address"
-    
+
     messages = [None]*len(receiver_emails)
     error_flag = 0
-    
+
     print("")
 
     for i in range(len(receiver_emails)):
         #print(str(i) + ": receiver = " + receivers[i] + "\t\t receiver email = " + receiver_emails[i])
-        
+
         messages[i] = ("""From: """ + sender + """ <"""+ sender_email + """>
 To: """ + receivers[i] + """ <""" + receiver_emails[i] + """>
 Subject: """ + subject + """
@@ -255,7 +258,6 @@ The IP address of """ + machine + """ has changed:\nOld external IP = """ + old_
                        + old_local_ip + """\r\nNew external IP = """ + new_external_ip + """\r\nNew local IP = """ +
                        new_local_ip + """\r\nThe Server queried was """ + server)
 
-
         #print (messages)
         #print (smtp_addr)
         #print (username)
@@ -263,6 +265,11 @@ The IP address of """ + machine + """ has changed:\nOld external IP = """ + old_
         #print (sender)
         #print (receiver_emails)
         #print (message)
+
+        if dry_run:
+            print("DRY RUN: not sending email to ", receiver_emails)
+            return 0
+
         try:
             smtpObj = smtplib.SMTP(smtp_addr)
             smtpObj.starttls()
@@ -275,7 +282,7 @@ The IP address of """ + machine + """ has changed:\nOld external IP = """ + old_
             print ("ERROR: unable to send email " + str(i+1) + " of " + str(len(receiver_emails)) + " to " + receiver_emails[i])
             print ("EXCEPTION: " + str(ex) + "\r\n")
             error_flag = 1
-    
+
     if (error_flag == 1):
         return 1
     else:
@@ -286,62 +293,63 @@ The IP address of """ + machine + """ has changed:\nOld external IP = """ + old_
 ##### MAIN #####
 ################
 
-#parse arguments
-if (len(sys.argv) != 2):
-    printhelp()
-    #print ("len = %d\r\n" % len(sys.argv))
-else:
-    config_path = str(sys.argv[1])
-    #print ("email = %s" % email)
-    #print ("machine = %s" % machine)
-    #print ("savefile = %s" % savefile_path)
-
-    #parse config file
-    config = ConfigInfo()
-    rc_ret = readconfig(config_path, config)
-    if (rc_ret == "nofile"):
-        sys.exit(1)
-    elif (rc_ret == "badline"):
-        sys.exit(2)
-
-    #print (config.sender)
-    #print (config.sender_email)
-    #print (config.sender_username)
-    #print (config.sender_password)
-    #print (config.receiver)
-    #print (config.receiver_email)
-    #print (config.subject_line)
-    #print (config.machine)
-    #print (config.smtp_addr)
-    #print (config.save_ip_path)
-
-    #get the old ip address
-    old_external_ip, old_local_ip = getoldips(config.save_ip_path)
-    #print ("Old IP = %s" % oldip)
-
-    #get current, external, IP address
-    curr_external_ip, curr_local_ip, server = getips(int(config.try_count), config.ip_blacklist)
-    #print ("Curr IP = %s" % external_ip)
-    #print ("Server used = %s" % server)
-
-    #check to see if the IP address has changed
-    if ((curr_external_ip != old_external_ip) or (curr_local_ip != old_local_ip)):
-        #send email
-        print ("Current IP differs from old IP.")
-        sm_ret = sendmail(old_external_ip, old_local_ip, curr_external_ip, curr_local_ip, server, config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr)
-
-        # only update the file if the email was successfully sent
-        if (sm_ret == 0):
-            #update file
-            updateoldips(config.save_ip_path,  curr_external_ip, curr_local_ip)
-            print ("Saved IP address updated.")
-        else:
-            print ("Saved IP address NOT updated.")
-
+def main():
+    #parse arguments
+    if (len(sys.argv) != 2):
+        printhelp()
+        #print ("len = %d\r\n" % len(sys.argv))
     else:
-        print ("Current IP = Old IP.  No need to send email.")
-    
-    sys.exit(0)
+        config_path = str(sys.argv[1])
+        #print ("email = %s" % email)
+        #print ("machine = %s" % machine)
+        #print ("savefile = %s" % savefile_path)
+
+        #parse config file
+        config = ConfigInfo()
+        rc_ret = readconfig(config_path, config)
+        if (rc_ret == "nofile"):
+            sys.exit(1)
+        elif (rc_ret == "badline"):
+            sys.exit(2)
+
+        #print (config.sender)
+        #print (config.sender_email)
+        #print (config.sender_username)
+        #print (config.sender_password)
+        #print (config.receiver)
+        #print (config.receiver_email)
+        #print (config.subject_line)
+        #print (config.machine)
+        #print (config.smtp_addr)
+        #print (config.save_ip_path)
+
+        #get the old ip address
+        old_external_ip, old_local_ip = getoldips(config.save_ip_path)
+        #print ("Old IP = %s" % oldip)
+
+        #get current, external, IP address
+        curr_external_ip, curr_local_ip, server = getips(int(config.try_count), config.ip_blacklist)
+        #print ("Curr IP = %s" % external_ip)
+        #print ("Server used = %s" % server)
+
+        #check to see if the IP address has changed
+        if ((curr_external_ip != old_external_ip) or (curr_local_ip != old_local_ip)):
+            #send email
+            print ("Current IP differs from old IP.")
+            sm_ret = sendmail(old_external_ip, old_local_ip, curr_external_ip, curr_local_ip, server, config.sender, config.sender_email, config.receiver, config.receiver_email, config.sender_username, config.sender_password, config.subject_line,  config.machine,  config.smtp_addr, config.dry_run)
+
+            # only update the file if the email was successfully sent
+            if (sm_ret == 0):
+                #update file
+                updateoldips(config.save_ip_path,  curr_external_ip, curr_local_ip)
+                print ("Saved IP address updated.")
+            else:
+                print ("Saved IP address NOT updated.")
+
+        else:
+            print ("Current IP = Old IP.  No need to send email.")
+
+        sys.exit(0)
 
 
 

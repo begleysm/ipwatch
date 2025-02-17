@@ -9,8 +9,8 @@ receiver_email=tomreceive@gmail.com
 subject_line=My IP Has Changed!
 machine=Test_Machine
 smtp_addr=smtp.gmail.com:587
-save_ip_path=/user/bob/ipwatch/oldip.txt
+save_ip_path=./oldip.txt
 try_count=10
 ip_blacklist=192.168.0.255,192.168.0.1,192.168.1.255,192.168.1.1
-dry_run=0
+dry_run=1
 

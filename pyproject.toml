@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ipwatch"
+dynamic = ["version"]
+description = """This program gets your external & internal IP addresses, checks them against
+your "saved" IP addresses and, if a difference is found, emails you the new
+IP's. This is useful for servers at residential locations whose IP address may
+change periodically due to actions by the ISP."""
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Sean Begley", email = "begleysm@gmail.com" },
+  { name = "Tom Vander Aa", email = "tom.vanderaa@gmail.com" },
+]
+
+[project.urls]
+Documentation = "https://github.com/begleysm/ipwatch#readme"
+Issues = "https://github.com/begleysm/ipwatch/issues"
+Source = "https://github.com/begleysm/ipwatch"
+
+[project.scripts]
+ipwatch = "ipwatch:main"
+ipget = "ipwatch.ipgetter:main"
+
+[template.plugins.default]
+src-layout = true
+
+[tool.hatch.version]
+path = "src/ipwatch/__about__.py"
